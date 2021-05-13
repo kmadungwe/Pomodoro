@@ -21,16 +21,6 @@ const Button = styled.button`
     `};
 `;
 
-const Para = styled.p`
-  margin: 0;
-
-  ${(props) =>
-    props.primary &&
-    css`
-      font-size: 7rem;
-    `};
-`;
-
 const Container = styled.div`
   background: transparent;
   border-radius: 3px;
@@ -50,12 +40,6 @@ const ContainerWrapper = styled.div`
   height: 100vh;
   align-items: center;
   font-family: 'Julius Sans One', sans-serif;
-`;
-
-const ButtonWrapper = styled.div`
-  margin-top: 15px;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
 `;
 
 function App() {
@@ -142,26 +126,91 @@ function App() {
   }, [sessionNumber]);
 
   return (
-    <>
-      <Para primary className='Para'>
-        {Duration.fromObject({ seconds: timerLength }).toFormat('mm:ss')}
-      </Para>
-      <Para className='Para'>
-        {timerFinish ? 'Timer is completed' : 'Timer running'}
-      </Para>
-      <ButtonWrapper className='ButtonWrapper'>
-        <Button className='Button' primary>
-          Session: {sessionNumber}
-        </Button>
-        <Button className='Button' onClick={() => setTimerOn(!timerOn)}>
+    <ContainerWrapper>
+      <Container>
+        <p>{Duration.fromObject({ seconds: timerLength }).toFormat('mm:ss')}</p>
+        <Button onClick={() => setTimerOn(!timerOn)}>
           {timerOn ? 'Pause' : 'Start Timer'}
         </Button>
-        <Button className='Button' primary>
-          {sessionType}
-        </Button>
-      </ButtonWrapper>
-    </>
+        <p>{timerFinish ? 'Timer is completed' : 'Timer running'}</p>
+        <Button primary>{sessionType}</Button>
+        <p>Session Number: {sessionNumber}</p>
+      </Container>
+      <p>Long break length inside timerjs: {longBreakLength}.</p>
+      <p>work length inside timerjs{workLength}.</p>
+      <p>breaklength inside timerjs{breakLength}.</p>
+    </ContainerWrapper>
   );
 }
 
 export default App;
+
+//here is customizer
+import React, { createContext, useState } from 'react';
+
+function Customizer(props) {
+  const [breakLength, setBreakLength] = useState(40);
+  const [workLength, setWorkLength] = useState(50);
+  const [longBreakLength, setLongBreakLength] = useState(30);
+
+  return (
+    <>
+      <workContext.Provider value={workLength}>
+        <breakContext.Provider value={breakLength}>
+          <longBreakContext.Provider value={longBreakLength}>
+            {props.children}
+          </longBreakContext.Provider>
+        </breakContext.Provider>
+      </workContext.Provider>
+      <p>{breakLength}</p>
+      <button
+        onClick={() => {
+          setBreakLength((prevLength) =>
+            prevLength === 0 ? 0 : prevLength - 1
+          );
+        }}
+      >
+        Decrease break length
+      </button>
+      <button
+        onClick={() => {
+          setBreakLength(breakLength + 1);
+        }}
+      >
+        Increase Break Length
+      </button>
+      <p>{workLength}</p>
+      <button
+        onClick={() => {
+          setWorkLength((prevLength) =>
+            prevLength === 0 ? 0 : prevLength - 1
+          );
+        }}
+      >
+        Decrease work length
+      </button>
+      <button onClick={() => setWorkLength(workLength + 1)}>
+        Increase work length
+      </button>
+      <p>{longBreakLength}</p>
+      <button
+        onClick={() => {
+          setLongBreakLength((prevLength) =>
+            prevLength === 0 ? 0 : prevLength - 1
+          );
+        }}
+      >
+        Decrease Long break length
+      </button>
+      <button onClick={() => setLongBreakLength(longBreakLength + 1)}>
+        Increase Long Break Length
+      </button>
+    </>
+  );
+}
+
+export const breakContext = createContext();
+export const workContext = createContext();
+export const longBreakContext = createContext();
+
+export default Customizer;
